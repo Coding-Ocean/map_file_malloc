@@ -1,9 +1,52 @@
-#define _SAMPLE
+#define _EX
 
 #ifdef _EX
 #include"libOne.h"
 void gmain() {
     window(1000, 1000);
+    //ファイルを開く
+    const char* fileName = "assets\\data.txt";
+    FILE* fp;
+    fopen_s(&fp,fileName,"rb");
+    //ファイルサイズを取得
+    fseek(fp, 0, SEEK_END);
+    int fileSize = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    //メモリ動的確保
+    char* map = (char*)malloc(fileSize);
+    //ファイルからメモリへ読み込む
+    fread(map, sizeof(char), fileSize, fp);
+    //ファイルを閉じる
+    fclose(fp);
+    //行数列数を数える
+    int rows = 0;
+    int cols = 0;
+    int cnt = 0;
+    print((let)"fileSize=" + fileSize);
+    for (int i = 0; i < fileSize; i++) {
+        cnt++;
+        if (map[i] == '\n') {
+            if (rows == 0) {
+                cols = cnt;
+            }
+            else if (cols != cnt) {
+                WARNING(1, "列数がそろっていない", "");
+            }
+            rows++;
+            cnt = 0;
+        }
+    }
+    if (fileSize % cols != 0) {
+        WARNING(1, "最後の行を改行していない", "");
+    }
+
+    print((let)"rows=" + rows);
+    print((let)"cols=" + cols);
+
+    //メモリの開放
+    free(map);
+    
+    
     while (notQuit) {
     }
 }
